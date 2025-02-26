@@ -14,6 +14,8 @@ interface MprisStatus {
   status: Mpris.PlaybackStatus;
   lastPlayed: number;
   canControl: boolean;
+  position: number;
+  length: number;
 }
 
 class ActiveMediaDetector implements Subscribable {
@@ -27,6 +29,17 @@ class ActiveMediaDetector implements Subscribable {
       .filter(([, status]) => {
         // Don't consider players that are stopped or can't be controlled
         if (status.status === Mpris.PlaybackStatus.STOPPED) {
+          return false;
+        }
+        // Most likely a live stream or something weird
+        if (status.position >= status.length) {
+          return false;
+        }
+        if (status.length <= 0 || status.position < 0) {
+          return false;
+        }
+        // If the media is longer than an hour, it's probably not a song
+        if (status.length > 60 * 60) {
           return false;
         }
         return status.canControl;
@@ -78,6 +91,8 @@ class ActiveMediaDetector implements Subscribable {
       status: player.playback_status,
       lastPlayed: lastPlayed,
       canControl: player.can_control,
+      position: player.position,
+      length: player.length,
     };
     this.#updateActive();
   }
@@ -220,7 +235,7 @@ function MediaDropdown({ activePlayer, onOverride }: MediaDropdownProps) {
                     iconName={bind(player, "playbackStatus").as((s) =>
                       s === Mpris.PlaybackStatus.PLAYING
                         ? "media-playback-pause-symbolic"
-                        : "media-playback-start-symbolic",
+                        : "media-playback-start-symbolic"
                     )}
                   />
                 </button>
@@ -286,7 +301,7 @@ export default function Media({ monitor }: MediaProps) {
             }}
           />,
           monitor,
-          { fullWidth: true },
+          { fullWidth: true }
         )
       }
       visible={activePlayer.as(Boolean)}
@@ -297,7 +312,7 @@ export default function Media({ monitor }: MediaProps) {
         }
 
         const icon = bind(player, "entry").as((e) =>
-          hasIcon(e) ? e : "audio-x-generic-symbolic",
+          hasIcon(e) ? e : "audio-x-generic-symbolic"
         );
 
         const marqueeOffset = Variable(0).poll(100, (offset) => {
@@ -316,7 +331,7 @@ export default function Media({ monitor }: MediaProps) {
               return false;
             }
             return position < 10 || length - position < 10;
-          },
+          }
         );
         showMarquee.subscribe((show) => {
           if (show) {
@@ -341,7 +356,7 @@ export default function Media({ monitor }: MediaProps) {
             }
             const offset = mo % line.length;
             return (line + line).slice(offset, offset + MARQUEE_LENGTH);
-          },
+          }
         );
 
         return (
@@ -349,7 +364,7 @@ export default function Media({ monitor }: MediaProps) {
             <image iconName={icon} />
             <stack
               visibleChildName={bind(showMarquee).as((show) =>
-                show ? "marquee" : "progress",
+                show ? "marquee" : "progress"
               )}
               transitionType={Gtk.StackTransitionType.CROSSFADE}
               transitionDuration={200}
