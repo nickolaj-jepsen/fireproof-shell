@@ -23,7 +23,7 @@ export const Expander = astalify<Gtk.Expander, Gtk.Expander.ConstructorProps>(
       }
       self.set_child(children[0]);
     },
-  },
+  }
 );
 
 export const Calendar = astalify<Gtk.Calendar, Gtk.Calendar.ConstructorProps>(
@@ -34,7 +34,7 @@ export const Calendar = astalify<Gtk.Calendar, Gtk.Calendar.ConstructorProps>(
     },
 
     setChildren(self, children) {},
-  },
+  }
 );
 
 export const ScrolledWindow = astalify<
@@ -74,7 +74,7 @@ export const Viewport = astalify<Gtk.Viewport, Gtk.Viewport.ConstructorProps>(
       }
       self.set_child(children[0]);
     },
-  },
+  }
 );
 
 export const FlowBox = astalify<Gtk.FlowBox, Gtk.FlowBox.ConstructorProps>(
@@ -86,5 +86,16 @@ export const FlowBox = astalify<Gtk.FlowBox, Gtk.FlowBox.ConstructorProps>(
         self.append(child);
       }
     },
-  },
+  }
 );
+
+export const SearchEntry = astalify<
+  Gtk.SearchEntry,
+  Gtk.SearchEntry.ConstructorProps
+>(Gtk.SearchEntry, {
+  getChildren(self) {
+    return [];
+  },
+
+  setChildren(self, children) {},
+});

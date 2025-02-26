@@ -1,0 +1,18 @@
+@use "../variables.scss" as *;
+
+.launcher--backdrop {
+  background-color: $bg;
+  opacity: 0.5;
+}
+
+.launcher {
+  background-color: $bg;
+  color: $fg;
+  margin: 30px;
+  border: 2px solid $accent;
+}
+
+.launcher--search {
+  padding: 15px;
+  background-color: $ui;
+}
