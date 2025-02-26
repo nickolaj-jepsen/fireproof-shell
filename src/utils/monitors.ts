@@ -18,7 +18,6 @@ export const getMonitors = (): {
   ];
 
   const monitors = App.get_monitors();
-  console.log("config.monitor.main", config.monitor.main);
   const main =
     scanFn.map((fn) => monitors.find(fn)).find((m) => m) || monitors[0];
   const secondary = monitors
@@ -40,6 +39,17 @@ export const getMonitors = (): {
       return monitor;
     });
   return { main, secondary };
+};
+
+export const activeMonitor = (): Gdk.Monitor => {
+  const hypr = Hyprland.get_default();
+  const hyprMonitor = hypr.focusedMonitor;
+  const monitors = App.get_monitors();
+  for (const monitor of monitors) {
+    if (monitor.get_connector() === hyprMonitor.get_name()) return monitor;
+  }
+
+  throw new Error("No active monitor found");
 };
 
 export function getHyprlandMonitor(monitor: Gdk.Monitor): Hyprland.Monitor {

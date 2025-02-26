@@ -12,6 +12,9 @@ interface Config {
   tray: {
     ignore: ignoreFn[];
   };
+  launcher: {
+    uwsm: boolean;
+  };
 }
 
 const envArray = (name: string): string[] => {
@@ -31,12 +34,15 @@ const envIgnoreArray = (name: string): ignoreFn[] => {
 
 export default {
   monitor: {
-    main: GLib.getenv("ASTRAL_PRIMARY_MONITOR") || "",
+    main: GLib.getenv("FIREPROOF_PRIMARY_MONITOR") || "",
   },
   notification: {
-    ignore: envIgnoreArray("ASTRAL_NOTIFICATION_IGNORE"),
+    ignore: envIgnoreArray("FIREPROOF_NOTIFICATION_IGNORE"),
   },
   tray: {
-    ignore: envIgnoreArray("ASTRAL_TRAY_IGNORE"),
+    ignore: envIgnoreArray("FIREPROOF_TRAY_IGNORE"),
+  },
+  launcher: {
+    uwsm: GLib.getenv("FIREPROOF_LAUNCHER_UWSM") === "true",
   },
 } as Config;

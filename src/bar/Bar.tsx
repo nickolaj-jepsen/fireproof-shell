@@ -14,7 +14,7 @@ import { Workspaces } from "./sections/Workspace";
 function SysTray() {
   const tray = Tray.get_default();
   const item = bind(tray, "items").as((items) =>
-    items.filter((item) => config.tray.ignore.every((test) => !test(item.id)))
+    items.filter((item) => config.tray.ignore.every((test) => !test(item.id))),
   );
 
   return (
@@ -30,7 +30,7 @@ function SysTray() {
           >
             <image gicon={bind(item, "gicon")} />
           </menubutton>
-        ))
+        )),
       )}
     </box>
   );
@@ -63,7 +63,7 @@ function Time(props: { monitor: Gdk.Monitor }) {
     1000,
     () => {
       return GLib.DateTime.new_now_local();
-    }
+    },
   );
   const date = bind(datetime).as((dt) => dt.format("%Y-%m-%d") ?? "");
   const time = bind(datetime).as((dt) => dt.format("%H:%M") ?? "");

@@ -41,7 +41,6 @@ export function connectDropdown(
   const width = Variable(-1);
   const isHovering = Variable.derive(
     [hoverTrigger, hoverOverlay],
-    // (trigger, overlay) => trigger || overlay,
     (trigger, overlay) => trigger || overlay,
   );
 

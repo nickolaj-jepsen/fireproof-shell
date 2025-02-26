@@ -1,0 +1,52 @@
+@use "../variables.scss" as *;
+
+.launcher {
+  --gap: 15px;
+  --border-radius: 4px;
+
+  background-color: $bg;
+  color: $fg;
+  border: 2px solid $accent;
+  padding: var(--gap);
+  border-radius: var(--border-radius);
+}
+
+.launcher__backdrop {
+  background-color: $bg;
+  opacity: 0.5;
+}
+
+.launcher__search {
+  padding: 15px;
+  margin-bottom: var(--gap);
+  background-color: $ui;
+  border-radius: var(--border-radius);
+}
+
+.launcher__results {
+}
+
+.launcher__result {
+  padding: 5px 10px;
+  margin: 5px 0;
+  border-radius: var(--border-radius);
+  border: 2px solid transparent;
+}
+
+.launcher__result--selected {
+  background-color: $ui;
+  border: 2px solid $accent;
+}
+
+.launcher__result__icon {
+  margin-right: var(--gap);
+}
+
+.launcher__result__name {
+  font-weight: bold;
+}
+
+.launcher__result__description {
+  color: $muted;
+  font-size: 0.8em;
+}

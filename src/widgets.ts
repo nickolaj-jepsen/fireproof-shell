@@ -88,3 +88,14 @@ export const FlowBox = astalify<Gtk.FlowBox, Gtk.FlowBox.ConstructorProps>(
     },
   },
 );
+
+export const SearchEntry = astalify<
+  Gtk.SearchEntry,
+  Gtk.SearchEntry.ConstructorProps
+>(Gtk.SearchEntry, {
+  getChildren(self) {
+    return [];
+  },
+
+  setChildren(self, children) {},
+});

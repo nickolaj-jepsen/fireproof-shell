@@ -1,6 +1,7 @@
 @use "./variables" as *;
 @use "./bar/Bar.scss" as *;
 @use "./notification/Notification.scss" as *;
+@use "./launcher/Launcher.scss" as *;
 @use "./bar/sections/Workspace.scss" as *;
 @use "./bar/sections/Dropdown.scss" as *;
 @use "./bar/sections/Media.scss" as *;

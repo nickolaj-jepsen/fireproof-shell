@@ -31,22 +31,23 @@
         pkgs,
         system,
         ...
-      }:let 
+      }: let
         extraPackages = with ags.packages.${pkgs.system}; [
+          pkgs.uwsm
           battery
           bluetooth
           hyprland
           network
           tray
           notifd
+          cava
           mpris
+          apps
           wireplumber
         ];
-      agsPackage = (
-        ags.packages.${system}.ags.override {
+        agsPackage = ags.packages.${system}.ags.override {
           inherit extraPackages;
-        }
-      );
+        };
       in {
         overlayAttrs = {
           inherit (config.packages) fireproof-shell;
@@ -65,7 +66,6 @@
             pkgs.watchexec
             agsPackage
           ];
-
         };
 
         treefmt = {
@@ -124,6 +124,11 @@
               default = [];
               example = ["/spotify/"];
             };
+
+            launcher.uwsm = lib.mkOption {
+              type = lib.types.bool;
+              default = false;
+            };
           };
           config = {
             systemd.user.services = lib.mkIf cfg.systemd {
@@ -138,16 +143,16 @@
                   ExecStart = "${cfg.package}/bin/fireproof-shell";
                   Restart = "on-failure";
                   KillMode = "mixed";
-                  # Environment = [
-                  #   "ASTRAL_PRIMARY_MONITOR=${cfg.monitors.primary}"
-                  #   "ASTRAL_NOTIFICATION_IGNORE=${lib.concatStringsSep "," cfg.notification.ignores}"
-                  #   "ASTRAL_TRAY_IGNORE=${lib.concatStringsSep "," cfg.tray.ignore}"
-                  # ];
+                  Slice = "app-graphical.slice";
                 };
                 environment = {
-                  ASTRAL_PRIMARY_MONITOR = cfg.monitor.primary;
-                  ASTRAL_NOTIFICATION_IGNORE = lib.concatStringsSep "," cfg.notification.ignores;
-                  ASTRAL_TRAY_IGNORE = lib.concatStringsSep "," cfg.tray.ignore;
+                  FIREPROOF_PRIMARY_MONITOR = cfg.monitor.primary;
+                  FIREPROOF_NOTIFICATION_IGNORE = lib.concatStringsSep "," cfg.notification.ignores;
+                  FIREPROOF_TRAY_IGNORE = lib.concatStringsSep "," cfg.tray.ignore;
+                  FIREPROOF_LAUNCHER_UWSM =
+                    if cfg.launcher.uwsm
+                    then "true"
+                    else "false";
                 };
                 wantedBy = ["graphical-session.target"];
               };

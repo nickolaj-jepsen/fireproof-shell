@@ -235,7 +235,7 @@ function MediaDropdown({ activePlayer, onOverride }: MediaDropdownProps) {
                     iconName={bind(player, "playbackStatus").as((s) =>
                       s === Mpris.PlaybackStatus.PLAYING
                         ? "media-playback-pause-symbolic"
-                        : "media-playback-start-symbolic"
+                        : "media-playback-start-symbolic",
                     )}
                   />
                 </button>
@@ -301,7 +301,7 @@ export default function Media({ monitor }: MediaProps) {
             }}
           />,
           monitor,
-          { fullWidth: true }
+          { fullWidth: true },
         )
       }
       visible={activePlayer.as(Boolean)}
@@ -312,7 +312,7 @@ export default function Media({ monitor }: MediaProps) {
         }
 
         const icon = bind(player, "entry").as((e) =>
-          hasIcon(e) ? e : "audio-x-generic-symbolic"
+          hasIcon(e) ? e : "audio-x-generic-symbolic",
         );
 
         const marqueeOffset = Variable(0).poll(100, (offset) => {
@@ -331,7 +331,7 @@ export default function Media({ monitor }: MediaProps) {
               return false;
             }
             return position < 10 || length - position < 10;
-          }
+          },
         );
         showMarquee.subscribe((show) => {
           if (show) {
@@ -356,7 +356,7 @@ export default function Media({ monitor }: MediaProps) {
             }
             const offset = mo % line.length;
             return (line + line).slice(offset, offset + MARQUEE_LENGTH);
-          }
+          },
         );
 
         return (
@@ -364,7 +364,7 @@ export default function Media({ monitor }: MediaProps) {
             <image iconName={icon} />
             <stack
               visibleChildName={bind(showMarquee).as((show) =>
-                show ? "marquee" : "progress"
+                show ? "marquee" : "progress",
               )}
               transitionType={Gtk.StackTransitionType.CROSSFADE}
               transitionDuration={200}
