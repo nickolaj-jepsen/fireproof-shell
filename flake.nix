@@ -31,27 +31,41 @@
         pkgs,
         system,
         ...
-      }: {
+      }:let 
+        extraPackages = with ags.packages.${pkgs.system}; [
+          battery
+          bluetooth
+          hyprland
+          network
+          tray
+          notifd
+          mpris
+          wireplumber
+        ];
+      agsPackage = (
+        ags.packages.${system}.ags.override {
+          inherit extraPackages;
+        }
+      );
+      in {
         overlayAttrs = {
           inherit (config.packages) fireproof-shell;
         };
 
         packages.fireproof-shell = ags.lib.bundle {
-          inherit pkgs;
+          inherit pkgs extraPackages;
           src = ./.;
           name = "fireproof-shell";
           gtk4 = true;
           entry = "app.ts";
-          extraPackages = with ags.packages.${pkgs.system}; [
-            battery
-            bluetooth
-            hyprland
-            network
-            tray
-            notifd
-            mpris
-            wireplumber
+        };
+
+        devShells.default = pkgs.mkShellNoCC {
+          nativeBuildInputs = [
+            pkgs.watchexec
+            agsPackage
           ];
+
         };
 
         treefmt = {
