@@ -48,6 +48,7 @@
         agsPackage = ags.packages.${system}.ags.override {
           inherit extraPackages;
         };
+        astalIoPackage = ags.packages.${system}.io;
       in {
         overlayAttrs = {
           inherit (config.packages) fireproof-shell;
@@ -60,6 +61,7 @@
           gtk4 = true;
           entry = "app.ts";
         };
+        packages.fireproof-ipc = astalIoPackage;
 
         devShells.default = pkgs.mkShellNoCC {
           nativeBuildInputs = [
@@ -107,30 +109,35 @@
               default = self.packages.${pkgs.system}.fireproof-shell;
             };
 
-            monitor.primary = lib.mkOption {
-              type = lib.types.str;
-              default = "";
-              example = "DP-1";
-            };
+            settings = {
+              monitor.main = lib.mkOption {
+                type = lib.types.str;
+                default = "";
+                example = "DP-1";
+              };
 
-            notification.ignores = lib.mkOption {
-              type = lib.types.listOf lib.types.str;
-              default = [];
-              example = ["/^Spotify/"];
-            };
+              notification.ignore = lib.mkOption {
+                type = lib.types.listOf lib.types.str;
+                default = [];
+                example = ["/^Spotify/"];
+              };
 
-            tray.ignore = lib.mkOption {
-              type = lib.types.listOf lib.types.str;
-              default = [];
-              example = ["/spotify/"];
-            };
+              tray.ignore = lib.mkOption {
+                type = lib.types.listOf lib.types.str;
+                default = [];
+                example = ["/spotify/"];
+              };
 
-            launcher.uwsm = lib.mkOption {
-              type = lib.types.bool;
-              default = false;
+              launcher.uwsm = lib.mkOption {
+                type = lib.types.bool;
+                default = false;
+              };
             };
           };
           config = {
+            environment.etc."fireproof-shell/config.json" = {
+              text = builtins.toJSON cfg.settings;
+            };
             systemd.user.services = lib.mkIf cfg.systemd {
               fireproof-shell = {
                 unitConfig = {

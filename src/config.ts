@@ -1,4 +1,6 @@
+import { readFile } from "astal";
 import GLib from "gi://GLib";
+import { mergeDeep } from "./utils/merge";
 
 type ignoreFn = (test: string) => boolean;
 
@@ -7,42 +9,42 @@ interface Config {
     main: string;
   };
   notification: {
-    ignore: ignoreFn[];
+    ignore: string[];
   };
   tray: {
-    ignore: ignoreFn[];
+    ignore: string[];
   };
   launcher: {
     uwsm: boolean;
   };
 }
 
-const envArray = (name: string): string[] => {
-  const value = GLib.getenv(name);
-  if (!value) return [];
-  return value.split(",");
-};
-
-const envIgnoreArray = (name: string): ignoreFn[] => {
-  return envArray(name).map((r: string) => {
-    if (r.startsWith("/")) {
-      return new RegExp(r.slice(1, -1)).test;
-    }
-    return (test: string) => test === r;
-  });
-};
-
-export default {
+const DEFAULT: Config = {
   monitor: {
-    main: GLib.getenv("FIREPROOF_PRIMARY_MONITOR") || "",
+    main: "",
   },
   notification: {
-    ignore: envIgnoreArray("FIREPROOF_NOTIFICATION_IGNORE"),
+    ignore: [],
   },
   tray: {
-    ignore: envIgnoreArray("FIREPROOF_TRAY_IGNORE"),
+    ignore: [],
   },
   launcher: {
-    uwsm: GLib.getenv("FIREPROOF_LAUNCHER_UWSM") === "true",
+    uwsm: false,
   },
-} as Config;
+};
+
+const parseConfig = (): Config => {
+  const configs: Config[] = [];
+
+  const systemConfig = readFile("/etc/fireproof-shell/config.json");
+  if (systemConfig) {
+    configs.push(JSON.parse(systemConfig));
+  }
+
+  const result = mergeDeep(DEFAULT, ...configs);
+  console.log("Config:", result);
+  return result;
+};
+
+export default parseConfig();

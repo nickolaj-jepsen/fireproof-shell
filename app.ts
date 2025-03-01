@@ -6,11 +6,10 @@ import NotificationPopups from "./src/notification/NotificationPopups";
 import Bar from "./src/bar/Bar";
 import SecondaryBar from "./src/bar/SecondaryBar";
 
-const HELP_TEXT = `
-fireproof-shell
+const HELP_TEXT = `fireproof-shell (over astal ipc)
 
 Usage:
-  fireproof-shell [command]
+  astal [command]
 
 Commands:
   launcher  Open the launcher
