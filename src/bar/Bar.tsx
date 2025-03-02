@@ -10,6 +10,7 @@ import { connectDropdown } from "./sections/Dropdown";
 import Media from "./sections/Media";
 import { Playback } from "./sections/Playback";
 import { Workspaces } from "./sections/Workspace";
+import { openLauncher } from "../launcher/Launcher";
 
 function SysTray() {
   const tray = Tray.get_default();
@@ -82,6 +83,16 @@ function Time(props: { monitor: Gdk.Monitor }) {
   );
 }
 
+// Get it? hahahaha
+function LauncherLauncher() {
+  return (
+    <image
+      iconName="fireproof-shell-logo"
+      onButtonPressed={() => openLauncher()}
+    />
+  );
+}
+
 export default function Bar(monitor: Gdk.Monitor) {
   const { TOP, LEFT, RIGHT } = Astal.WindowAnchor;
   const hyprlandMonitor = getHyprlandMonitor(monitor);
@@ -100,13 +111,14 @@ export default function Bar(monitor: Gdk.Monitor) {
     >
       <centerbox cssClasses={["Bar"]}>
         <box halign={Gtk.Align.START} cssClasses={["Left"]}>
+          <LauncherLauncher />
           <Time monitor={monitor} />
           <Workspaces
             monitor={hyprlandMonitor}
             selectedWorkspaces={[1, 2, 3, 4, 5]}
           />
         </box>
-        <box halign={Gtk.Align.CENTER}>
+        <box halign={Gtk.Align.CENTER} hexpand>
           <FocusedClient />
         </box>
         <box halign={Gtk.Align.END} cssClasses={["Right"]}>

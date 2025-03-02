@@ -84,7 +84,7 @@ class Hypr implements LauncherPlugin {
             description: description === name ? undefined : description,
             action: () => client.focus(),
           };
-        })
+        }),
     );
   }
 }
