@@ -44,21 +44,22 @@ export default function Launcher() {
   const selected = Variable(0);
   const entryRef = Variable<Gtk.Entry | null>(null);
   const search = Variable("");
+  const resultLength = Variable(0); // Cache the length of the results so we don't have to recalculate it every time the cursor moves
 
   const setSearch = (query: string) => {
     search.set(query);
     selected.set(0);
   };
 
-  const buffer = new Gtk.EntryBuffer();
-
-  const currentPlugin = search((search) => {
+  const currentPlugin = bind(search).as((search) => {
     return parseQuery(search)[0];
   });
 
-  const results = search((search) => {
+  const results = bind(search).as((search) => {
     const [plugin, query] = parseQuery(search);
-    return plugin.query(query);
+    const result = plugin.query(query);
+    resultLength.set(result.length);
+    return result;
   });
 
   const setPlugin = (plugin: LauncherPlugin) => {
@@ -101,7 +102,7 @@ export default function Launcher() {
 
   const moveCursor = (direction: number) => {
     const newValue = selected.get() + direction;
-    const max = results.get().length - 1;
+    const max = resultLength.get() - 1;
     selected.set(clamp(newValue, 0, max));
   };
 
