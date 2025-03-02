@@ -37,6 +37,12 @@ export default function Launcher() {
   const my = size((size) => size.my);
 
   const search = Variable("");
+  const buffer = new Gtk.EntryBuffer();
+  buffer.connect("inserted-text", (self) => search.set(self.text));
+  buffer.connect("deleted-text", (self, position) =>
+    search.set(self.text.substring(0, position)),
+  );
+
   const selected = Variable(0);
 
   const results = search((search) => {
@@ -51,13 +57,6 @@ export default function Launcher() {
     } else {
       selected.set(selected.get() + direction);
     }
-
-    // const pos = selected.get();
-    // if (pos > 6) {
-    //   const scroll = pos - 6;
-    //   const scrollPx = scroll * lineHeight.get();
-    //   console.log(scrollPx);
-    // }
   };
 
   const onKeyPressed = (
@@ -98,9 +97,10 @@ export default function Launcher() {
       anchor={TOP | LEFT | RIGHT | BOTTOM}
       application={App}
       onKeyPressed={onKeyPressed}
-      onNotifyVisible={() => {
+      onNotifyVisible={(self) => {
         // Reset state when launcher is opened / closed
         search.set("");
+        buffer.text = "";
         selected.set(0);
 
         const { width, height } = activeMonitor().get_geometry();
@@ -122,9 +122,9 @@ export default function Launcher() {
         >
           <entry
             cssClasses={["launcher__search"]}
+            buffer={buffer}
             onChanged={(x) => {
               selected.set(0);
-              search.set(x.text);
             }}
             onActivate={() => {
               open(results.get()[selected.get()]);
