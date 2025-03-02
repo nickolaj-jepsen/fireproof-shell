@@ -152,15 +152,7 @@
                   KillMode = "mixed";
                   Slice = "app-graphical.slice";
                 };
-                environment = {
-                  FIREPROOF_PRIMARY_MONITOR = cfg.monitor.primary;
-                  FIREPROOF_NOTIFICATION_IGNORE = lib.concatStringsSep "," cfg.notification.ignores;
-                  FIREPROOF_TRAY_IGNORE = lib.concatStringsSep "," cfg.tray.ignore;
-                  FIREPROOF_LAUNCHER_UWSM =
-                    if cfg.launcher.uwsm
-                    then "true"
-                    else "false";
-                };
+
                 wantedBy = ["graphical-session.target"];
               };
             };
