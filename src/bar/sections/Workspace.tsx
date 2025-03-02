@@ -11,12 +11,12 @@ type WorkspacesProps = {
 const hypr = Hyprland.get_default();
 
 const ICON_MAP = {
-  terminal: ["kitty", "com.mitchellh.ghostty"],
+  "terminal-custom": ["kitty", "com.mitchellh.ghostty"],
   "firefox-custom": ["firefox", "firefox-developer-edition"],
   "chrome-custom": ["google-chrome", "chromium"],
-  python: ["jetbrains-pycharm"],
+  "python-custom": ["jetbrains-pycharm"],
   "vscode-custom": ["Code", "code-oss"],
-  "git-symbolic": ["smerge", "sublime_merge"],
+  "git-custom": ["smerge", "sublime_merge"],
 };
 
 function Workspace(workspace: Hyprland.Workspace) {

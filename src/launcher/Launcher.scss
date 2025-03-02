@@ -23,7 +23,16 @@
   border-radius: var(--border-radius);
 }
 
-.launcher__results {
+.launcher__plugin {
+  padding: 5px 10px;
+  margin: 5px 0;
+  border-radius: var(--border-radius);
+  border: 2px solid transparent;
+}
+
+.launcher__plugin--selected {
+  background-color: $ui;
+  border: 2px solid $accent;
 }
 
 .launcher__result {
