@@ -8,6 +8,8 @@ export interface LauncherEntry {
   iconName: string;
   name: string;
   description?: string;
+  label?: string;
+  keywords?: string[];
   action: () => void;
 }
 
@@ -46,27 +48,20 @@ class Hypr implements LauncherPlugin {
   name = "Hypr";
   command = "!h";
   hypr = Hyprland.get_default();
+  apps: {
+    [key: string]: {
+      name: string;
+      icon: string;
+    };
+  };
 
-  // These calculate classes are a mess, but thats a problem for future me
-  private calculateIconName(client: Hyprland.Client): string {
-    const initial_title = client.get_initial_title();
-    if (initial_title === "Visual Studio Code") return "com.visualstudio.code";
-
-    return client.get_class();
-  }
-
-  private calculateName(client: Hyprland.Client): string {
-    const className = client.get_class();
-    const initial_class = client.get_initial_class();
-
-    if (className === "com.mitchellh.ghostty") return "Ghostty";
-    if (initial_class === "sublime_merge") return "Sublime Merge";
-
-    return client.get_initial_title() || client.get_title();
-  }
-
-  private calculateDescription(client: Hyprland.Client): string {
-    return client.get_title();
+  constructor() {
+    const x = new Apps.Apps();
+    this.apps = x.get_list().reduce<Hypr["apps"]>((acc, app) => {
+      const entry = app.entry.replace(/.desktop$/, "");
+      acc[entry] = { icon: app.iconName, name: app.name };
+      return acc;
+    }, {});
   }
 
   query(query: string): LauncherEntry[] {
@@ -75,15 +70,30 @@ class Hypr implements LauncherPlugin {
       this.hypr.clients
         .sort((a, b) => a.get_focus_history_id() - b.get_focus_history_id())
         .map((client) => {
-          const name = this.calculateName(client);
-          const description = this.calculateDescription(client);
+          const app = this.apps[client.get_class().toLowerCase()];
+          const workspace = client.get_workspace();
 
-          return {
-            iconName: this.calculateIconName(client),
-            name,
-            description: description === name ? undefined : description,
-            action: () => client.focus(),
-          };
+          if (app) {
+            return {
+              iconName: app.icon,
+              name: app.name,
+              label: workspace.get_name(),
+              description: client.get_title(),
+              action: () => client.focus(),
+            };
+          } else {
+            const title = client.get_title();
+            const initTitle = client.get_initial_title() || title;
+            const hasUpdatedTitle = initTitle !== title;
+
+            return {
+              iconName: "application-x-executable-symbolic",
+              name: hasUpdatedTitle ? initTitle : title,
+              label: workspace.get_name(),
+              description: hasUpdatedTitle ? title : undefined,
+              action: () => client.focus(),
+            };
+          }
         }),
     );
   }
@@ -98,27 +108,32 @@ class Power implements LauncherPlugin {
       {
         iconName: "system-log-out-custom-symbolic",
         name: "Lock",
+        keywords: ["logout"],
         action: () => subprocess("loginctl lock-session"),
       },
       {
         iconName: "system-shutdown-custom-symbolic",
         name: "Shutdown",
+        keywords: ["poweroff"],
         action: () => subprocess("systemctl poweroff"),
       },
       {
         iconName: "system-reboot-custom-symbolic",
         name: "Reboot",
+        keywords: ["restart"],
         action: () => subprocess("systemctl reboot"),
-      },
-      {
-        iconName: "system-suspend-custom-symbolic",
-        name: "Suspend",
-        action: () => subprocess("systemctl suspend"),
       },
       {
         iconName: "system-hibernate-custom-symbolic",
         name: "Hibernate",
+        keywords: ["sleep"],
         action: () => subprocess("systemctl hibernate"),
+      },
+      {
+        iconName: "system-suspend-custom-symbolic",
+        name: "Suspend",
+        keywords: ["sleep"],
+        action: () => subprocess("systemctl suspend"),
       },
     ]);
   }

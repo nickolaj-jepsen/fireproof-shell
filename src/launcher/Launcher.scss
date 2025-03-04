@@ -47,8 +47,18 @@
   border: 2px solid $accent;
 }
 
-.launcher__result__icon {
-  margin-right: var(--gap);
+.launcher__result__text {
+  margin-left: var(--gap);
+}
+
+.launcher__result__label {
+  font-size: 10px;
+  color: $black;
+  background-color: $accent;
+  margin-right: -4px;
+  margin-bottom: -4px;
+  padding: 1px 3px;
+  border-radius: var(--border-radius);
 }
 
 .launcher__result__name {

@@ -253,12 +253,28 @@ export default function Launcher() {
                         );
                       }}
                     >
-                      <image
-                        iconName={result.iconName ?? ""}
-                        cssClasses={["launcher__result__icon"]}
-                        pixelSize={32}
-                      />
-                      <box vertical valign={Gtk.Align.CENTER}>
+                      <overlay>
+                        {result.label && (
+                          <label
+                            label={result.label}
+                            valign={Gtk.Align.END}
+                            halign={Gtk.Align.END}
+                            ellipsize={Pango.EllipsizeMode.END}
+                            type="overlay"
+                            cssClasses={["launcher__result__label"]}
+                          />
+                        )}
+                        <image
+                          iconName={result.iconName ?? ""}
+                          cssClasses={["launcher__result__icon"]}
+                          pixelSize={32}
+                        />
+                      </overlay>
+                      <box
+                        vertical
+                        valign={Gtk.Align.CENTER}
+                        cssClasses={["launcher__result__text"]}
+                      >
                         <label
                           label={result.name}
                           halign={Gtk.Align.START}

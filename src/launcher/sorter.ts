@@ -15,7 +15,7 @@ export const sortByRelevancy = (
     .map((entry) => {
       const nameLower = entry.name.toLowerCase();
       const descLower = entry.description?.toLowerCase() || "";
-
+      const keywords = entry.keywords?.map((kw) => kw.toLowerCase()) || [];
       let relevance = 0;
 
       // Exact match has highest priority
@@ -23,9 +23,19 @@ export const sortByRelevancy = (
         relevance += 100;
       }
 
+      // Direct keyword match has very high priority
+      if (keywords.some((kw) => kw === queryLower)) {
+        relevance += 90;
+      }
+
       // Starts with query is next highest
       if (nameLower.startsWith(queryLower)) {
         relevance += 50;
+      }
+
+      // Keyword starts with query
+      if (keywords.some((kw) => kw.startsWith(queryLower))) {
+        relevance += 40;
       }
 
       // Contains the query string
@@ -36,6 +46,11 @@ export const sortByRelevancy = (
       // Calculate word-level matches
       for (const word of queryWords) {
         if (word.length < 2) continue;
+
+        // Keyword contains the query term
+        if (keywords.some((kw) => kw.includes(word))) {
+          relevance += 25;
+        }
 
         // Word match
         if (nameLower.split(/\s+/).some((nameWord) => nameWord === word)) {
