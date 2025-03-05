@@ -6,6 +6,7 @@ import config from "../config";
 import { VarMap } from "../utils/var-map";
 import Notification from "./Notification";
 import { ScrolledWindow } from "../widgets";
+import { compareMany, patternsToCompare } from "../utils/ignore";
 
 class NotificationMap extends VarMap<number, Gtk.Widget> {
   #notifd = Notifd.get_default();
@@ -16,6 +17,7 @@ class NotificationMap extends VarMap<number, Gtk.Widget> {
 
   constructor() {
     super();
+    const ignore = patternsToCompare(config.notification.ignore);
 
     this.#notifd.connect("notified", (_, id) => {
       const notification = this.#notifd.get_notification(id);
@@ -24,12 +26,11 @@ class NotificationMap extends VarMap<number, Gtk.Widget> {
       }
 
       // Ignore notifications based on the app name
-      for (const test of config.notification.ignore) {
-        if (test(notification.app_name)) {
-          notification.dismiss();
-          return;
-        }
+      if (compareMany(notification.app_name, ignore)) {
+        notification.dismiss();
+        return;
       }
+
       this.set(id, Notification({ notification }));
     });
 

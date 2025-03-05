@@ -11,11 +11,13 @@ import Media from "./sections/Media";
 import { Playback } from "./sections/Playback";
 import { Workspaces } from "./sections/Workspace";
 import { openLauncher } from "../launcher/Launcher";
+import { compareMany, patternsToCompare } from "../utils/ignore";
 
 function SysTray() {
   const tray = Tray.get_default();
+  const ignores = patternsToCompare(config.tray.ignore);
   const item = bind(tray, "items").as((items) =>
-    items.filter((item) => config.tray.ignore.every((test) => !test(item.id))),
+    items.filter((item) => !compareMany(item.id, ignores)),
   );
 
   return (
