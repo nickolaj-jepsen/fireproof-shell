@@ -66,6 +66,8 @@
         devShells.default = pkgs.mkShellNoCC {
           nativeBuildInputs = [
             pkgs.watchexec
+            pkgs.just
+            pkgs.libnotify
             agsPackage
           ];
         };

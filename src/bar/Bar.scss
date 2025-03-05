@@ -89,3 +89,8 @@
   border-right: 2px solid $accent;
   padding: 4px 15px;
 }
+
+.launcher__launcher:hover {
+  background-color: $bg-alt;
+  color: $accent;
+}

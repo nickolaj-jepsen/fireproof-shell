@@ -5,6 +5,7 @@ import { Astal, type Gdk, Gtk } from "astal/gtk4";
 import config from "../config";
 import { VarMap } from "../utils/var-map";
 import Notification from "./Notification";
+import { ScrolledWindow } from "../widgets";
 
 class NotificationMap extends VarMap<number, Gtk.Widget> {
   #notifd = Notifd.get_default();
@@ -43,19 +44,12 @@ class NotificationMap extends VarMap<number, Gtk.Widget> {
 export default function NotificationPopups(gdkmonitor: Gdk.Monitor) {
   const { TOP, RIGHT } = Astal.WindowAnchor;
   const notificationsMap = new NotificationMap();
-  const offset = new Variable(0);
   const count = bind(notificationsMap).as((map) => map.length);
-  const offsetNotifications = Variable.derive(
-    [notificationsMap, offset],
-    (map, offset) => map.slice(offset),
-  );
-  const offsetLength = bind(offsetNotifications).as((map) => map.length);
 
   return (
     <window
       name={"notifications"}
       application={App}
-      cssClasses={["NotificationPopups"]}
       gdkmonitor={gdkmonitor}
       layer={Astal.Layer.OVERLAY}
       exclusivity={Astal.Exclusivity.EXCLUSIVE}
@@ -63,46 +57,34 @@ export default function NotificationPopups(gdkmonitor: Gdk.Monitor) {
       visible={count.as((n) => n > 0)}
       vexpand={true}
       valign={Gtk.Align.START}
+      setup={(self) => {
+        hook(self, notificationsMap, (self, _) => {
+          self.queue_allocate();
+        });
+      }}
     >
-      <box vertical={true} halign={Gtk.Align.END}>
-        {bind(offsetNotifications).as((map) => map.slice(0, 5))}
+      <box vertical={true}>
         <box
-          cssClasses={["NotificationMenu"]}
-          visible={count.as((n) => n > 2)}
+          visible={count.as((n) => n > 1)}
+          cssClasses={["notification__menu"]}
           halign={Gtk.Align.END}
-          spacing={10}
+          spacing={20}
         >
-          <box
-            visible={count.as((n) => n > 5)}
-            vertical
-            spacing={10}
-            widthRequest={50}
-          >
-            {bind(offset).as((n) => (
-              <button
-                hexpand
-                onClicked={() => offset.set(Math.max(offset.get() - 5, 0))}
-                cssClasses={n > 0 ? [] : ["disabled"]}
-                label={n > 0 ? `▲ ${n}` : "▲ 0"}
-              />
-            ))}
-            {offsetLength.as((n) => (
-              <button
-                hexpand
-                onClicked={() =>
-                  offset.set(Math.min(offset.get() + 5, count.get() - 5))
-                }
-                cssClasses={n > 5 ? [] : ["disabled"]}
-                label={n > 5 ? `▼ ${n - 5}` : "▼ 0"}
-              />
-            ))}
-          </box>
+          <label
+            cssClasses={["notification__menu__count"]}
+            xalign={0}
+            label={count.as((n) =>
+              n === 1 ? "1 notification" : `${n} notifications`,
+            )}
+          />
           <button
-            cssClasses={["large"]}
-            onClicked={() => notificationsMap.clear()}
-            label={count.as((n) => `Dismiss all (${n})`)}
+            onClicked={() => {
+              notificationsMap.clear();
+            }}
+            label="Dismiss all"
           />
         </box>
+        {bind(notificationsMap).as((map) => map.slice(0, 50))}
       </box>
     </window>
   );

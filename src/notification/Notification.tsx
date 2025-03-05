@@ -3,6 +3,7 @@ import { GLib, timeout } from "astal";
 import { type Astal, Gtk } from "astal/gtk4";
 import { hook } from "astal/gtk4";
 import { Separator } from "../widgets";
+import Pango from "gi://Pango?version=1.0";
 
 const ANIMATION_DURATION = 500;
 
@@ -35,60 +36,61 @@ export default function Notification({ notification: n }: Props) {
   const icon = n.appIcon || n.desktopEntry;
   return (
     <box
-      cssClasses={["Notification", urgency(n.urgency)]}
+      cssClasses={["notification", urgency(n.urgency)]}
       onButtonReleased={(_, asdf) => {
         n.dismiss();
       }}
-      vertical
-      widthRequest={300}
       spacing={10}
     >
-      <box cssClasses={["header"]} spacing={10}>
-        <image cssClasses={["app-icon"]} {...resolveImageProps(icon)} />
-        <label
-          cssClasses={["app-name"]}
-          maxWidthChars={40}
-          wrap
-          label={n.appName || "Unknown"}
-          hexpand
-          halign={Gtk.Align.START}
-        />
-        <label
-          cssClasses={["time"]}
-          halign={Gtk.Align.END}
-          label={time(n.time)}
-        />
-      </box>
-      <Separator />
-      <box cssClasses={["content"]} spacing={10}>
-        <image
-          {...resolveImageProps(
-            n.summary === "message"
-              ? "/home/nickolaj/Downloads/billigvvs.dk.png"
-              : n.image,
-          )}
-          pixelSize={160}
-          halign={Gtk.Align.START}
-          valign={Gtk.Align.START}
-        />
-        <box vertical spacing={10}>
+      <image
+        {...resolveImageProps(
+          n.summary === "message"
+            ? "/home/nickolaj/Downloads/billigvvs.dk.png"
+            : n.image,
+        )}
+        pixelSize={160}
+        halign={Gtk.Align.START}
+        valign={Gtk.Align.START}
+        cssClasses={["notification__image"]}
+      />
+      <box vertical spacing={10} cssClasses={["notification__content"]} hexpand>
+        <box cssClasses={["header"]} spacing={10}>
+          <image cssClasses={["app-icon"]} {...resolveImageProps(icon)} />
           <label
+            cssClasses={["app-name"]}
+            ellipsize={Pango.EllipsizeMode.END}
+            label={n.appName || "Unknown"}
             hexpand
-            cssClasses={["summary"]}
-            label={n.summary}
-            wrap
             halign={Gtk.Align.START}
-            maxWidthChars={n.image ? 40 : 60}
+          />
+          <label
+            cssClasses={["time"]}
+            halign={Gtk.Align.END}
+            label={time(n.time)}
+          />
+        </box>
+        <Separator />
+        <box cssClasses={["content"]} vertical spacing={10} hexpand>
+          <label
+            cssClasses={["notification__summary"]}
+            label={n.summary}
+            hexpand
+            xalign={0}
+            maxWidthChars={1}
+            ellipsize={Pango.EllipsizeMode.END}
           />
           {n.body && (
             <label
-              hexpand
               cssClasses={["body"]}
               useMarkup
               label={n.body}
-              halign={Gtk.Align.START}
-              maxWidthChars={n.summary === "message" ? 40 : 60}
               wrap
+              wrapMode={Pango.WrapMode.WORD}
+              hexpand
+              lines={3}
+              xalign={0}
+              maxWidthChars={1}
+              ellipsize={Pango.EllipsizeMode.END}
             />
           )}
           {n.get_actions().length > 0 && (

@@ -2,7 +2,7 @@ import Hyprland from "gi://AstalHyprland";
 import Tray from "gi://AstalTray";
 import Pango from "gi://Pango?version=1.0";
 import { GLib, Variable, bind } from "astal";
-import { App, Astal, type Gdk, Gtk } from "astal/gtk4";
+import { App, Astal, Gdk, Gtk } from "astal/gtk4";
 import config from "../config";
 import { getHyprlandMonitor } from "../utils/monitors";
 import { Calendar } from "../widgets";
@@ -87,7 +87,9 @@ function Time(props: { monitor: Gdk.Monitor }) {
 function LauncherLauncher() {
   return (
     <image
+      cssClasses={["launcher__launcher"]}
       iconName="fireproof-shell-logo"
+      cursor={Gdk.Cursor.new_from_name("pointer", null)}
       onButtonPressed={() => openLauncher()}
     />
   );

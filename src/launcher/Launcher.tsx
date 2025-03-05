@@ -202,6 +202,7 @@ export default function Launcher() {
               return [defaultPlugin, ...launcherPlugins].map((plugin) => (
                 <button
                   label={plugin.name}
+                  cursor={Gdk.Cursor.new_from_name("pointer", null)}
                   cssClasses={
                     plugin === currentPlugin
                       ? ["launcher__plugin", "launcher__plugin--selected"]
@@ -235,6 +236,7 @@ export default function Launcher() {
                 return results.map((result, index) => {
                   return (
                     <box
+                      cursor={Gdk.Cursor.new_from_name("pointer", null)}
                       cssClasses={selected((selected) =>
                         selected === index
                           ? ["launcher__result", "launcher__result--selected"]
