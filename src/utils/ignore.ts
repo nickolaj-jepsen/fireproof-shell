@@ -1,5 +1,5 @@
 export function patternsToCompare(
-  patterns: string[]
+  patterns: string[],
 ): ((str: string) => boolean)[] {
   return patterns.map((pattern) => {
     // Check if the pattern should be treated as a regex
@@ -15,7 +15,7 @@ export function patternsToCompare(
       } catch (e) {
         // If regex is invalid, fall back to substring match
         console.warn(
-          `Invalid regex pattern: ${pattern}. Using as substring match instead.`
+          `Invalid regex pattern: ${pattern}. Using as substring match instead.`,
         );
         return (str: string) => str.includes(pattern);
       }
@@ -31,7 +31,7 @@ export function patternsToCompare(
  */
 export function compareMany(
   str: string,
-  compareFunctions: ((str: string) => boolean)[]
+  compareFunctions: ((str: string) => boolean)[],
 ): boolean {
   return compareFunctions.some((compareFunction) => compareFunction(str));
 }

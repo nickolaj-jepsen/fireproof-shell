@@ -1,11 +1,6 @@
 @use "../../variables.scss" as *;
 
 .workspace {
-  all: unset; // unset default button styles
-  &:hover {
-    all: unset;
-  }
-
   transition: opacity $transition;
   opacity: 0.2;
 

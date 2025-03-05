@@ -2,7 +2,7 @@ import Mpris from "gi://AstalMpris";
 import Pango from "gi://Pango?version=1.0";
 import { type Binding, Variable, bind } from "astal";
 import type { Subscribable } from "astal/binding";
-import { type Gdk, Gtk } from "astal/gtk4";
+import { Gdk, Gtk } from "astal/gtk4";
 import { hasIcon } from "../../utils/gtk";
 import { Expander, Separator } from "../../widgets";
 import { connectDropdown } from "./Dropdown";
@@ -227,19 +227,31 @@ function MediaDropdown({ activePlayer, onOverride }: MediaDropdownProps) {
                 spacing={10}
                 halign={Gtk.Align.CENTER}
               >
-                <button onClicked={() => player.previous()}>
+                <button
+                  cssClasses={["button"]}
+                  cursor={Gdk.Cursor.new_from_name("pointer", null)}
+                  onClicked={() => player.previous()}
+                >
                   <image iconName="media-skip-backward-symbolic" />
                 </button>
-                <button onClicked={() => player.play_pause()}>
+                <button
+                  cssClasses={["button"]}
+                  cursor={Gdk.Cursor.new_from_name("pointer", null)}
+                  onClicked={() => player.play_pause()}
+                >
                   <image
                     iconName={bind(player, "playbackStatus").as((s) =>
                       s === Mpris.PlaybackStatus.PLAYING
                         ? "media-playback-pause-symbolic"
-                        : "media-playback-start-symbolic"
+                        : "media-playback-start-symbolic",
                     )}
                   />
                 </button>
-                <button onClicked={() => player.next()}>
+                <button
+                  cssClasses={["button"]}
+                  cursor={Gdk.Cursor.new_from_name("pointer", null)}
+                  onClicked={() => player.next()}
+                >
                   <image iconName="media-skip-forward-symbolic" />
                 </button>
               </box>
@@ -260,9 +272,12 @@ function MediaDropdown({ activePlayer, onOverride }: MediaDropdownProps) {
           {allPlayers.as((players) => {
             return players.map((p) => (
               <button
+                cursor={Gdk.Cursor.new_from_name("pointer", null)}
                 onClicked={() => onOverride(p.bus_name)}
                 cssClasses={activePlayer.as((player) => {
-                  return p.bus_name === player?.bus_name ? ["active"] : [];
+                  return p.bus_name === player?.bus_name
+                    ? ["active", "button"]
+                    : ["button"];
                 })}
               >
                 <label label={p.identity} />
@@ -301,7 +316,7 @@ export default function Media({ monitor }: MediaProps) {
             }}
           />,
           monitor,
-          { fullWidth: true }
+          { fullWidth: true },
         )
       }
       visible={activePlayer.as(Boolean)}
@@ -312,7 +327,7 @@ export default function Media({ monitor }: MediaProps) {
         }
 
         const icon = bind(player, "entry").as((e) =>
-          hasIcon(e) ? e : "audio-x-generic-symbolic"
+          hasIcon(e) ? e : "audio-x-generic-symbolic",
         );
 
         const marqueeOffset = Variable(0).poll(100, (offset) => {
@@ -331,7 +346,7 @@ export default function Media({ monitor }: MediaProps) {
               return false;
             }
             return position < 10 || length - position < 10;
-          }
+          },
         );
         showMarquee.subscribe((show) => {
           if (show) {
@@ -365,7 +380,7 @@ export default function Media({ monitor }: MediaProps) {
             const repeatedText = line.repeat(3); // Repeat 3 times for a smoother loop
             const offset = mo % line.length;
             return repeatedText.slice(offset, offset + MARQUEE_LENGTH);
-          }
+          },
         );
 
         return (
@@ -373,7 +388,7 @@ export default function Media({ monitor }: MediaProps) {
             <image iconName={icon} />
             <stack
               visibleChildName={bind(showMarquee).as((show) =>
-                show ? "marquee" : "progress"
+                show ? "marquee" : "progress",
               )}
               transitionType={Gtk.StackTransitionType.CROSSFADE}
               transitionDuration={200}

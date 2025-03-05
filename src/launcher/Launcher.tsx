@@ -242,9 +242,6 @@ export default function Launcher() {
                           ? ["launcher__result", "launcher__result--selected"]
                           : ["launcher__result"],
                       )}
-                      onHoverEnter={() => {
-                        selected.set(index);
-                      }}
                       onButtonReleased={() => {
                         result.action();
                         closeLauncher();

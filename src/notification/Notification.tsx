@@ -1,6 +1,6 @@
 import Notifd from "gi://AstalNotifd";
 import { GLib, timeout } from "astal";
-import { type Astal, Gtk } from "astal/gtk4";
+import { type Astal, Gdk, Gtk } from "astal/gtk4";
 import { hook } from "astal/gtk4";
 import { Separator } from "../widgets";
 import Pango from "gi://Pango?version=1.0";
@@ -40,7 +40,6 @@ export default function Notification({ notification: n }: Props) {
       onButtonReleased={(_, asdf) => {
         n.dismiss();
       }}
-      spacing={10}
     >
       <image
         {...resolveImageProps(
@@ -53,8 +52,8 @@ export default function Notification({ notification: n }: Props) {
         valign={Gtk.Align.START}
         cssClasses={["notification__image"]}
       />
-      <box vertical spacing={10} cssClasses={["notification__content"]} hexpand>
-        <box cssClasses={["header"]} spacing={10}>
+      <box vertical>
+        <box cssClasses={["notification__header"]} spacing={10}>
           <image cssClasses={["app-icon"]} {...resolveImageProps(icon)} />
           <label
             cssClasses={["app-name"]}
@@ -69,8 +68,12 @@ export default function Notification({ notification: n }: Props) {
             label={time(n.time)}
           />
         </box>
-        <Separator />
-        <box cssClasses={["content"]} vertical spacing={10} hexpand>
+        <box
+          cssClasses={["notification__content"]}
+          vertical
+          spacing={10}
+          hexpand
+        >
           <label
             cssClasses={["notification__summary"]}
             label={n.summary}
@@ -93,26 +96,27 @@ export default function Notification({ notification: n }: Props) {
               ellipsize={Pango.EllipsizeMode.END}
             />
           )}
-          {n.get_actions().length > 0 && (
-            <box
-              cssClasses={["actions"]}
-              halign={Gtk.Align.CENTER}
-              spacing={10}
-              vertical={n.get_actions().length > 2}
-            >
-              {n.get_actions().map(({ label, id }) => (
-                <button
-                  onClicked={(eve) => {
-                    n.invoke(id);
-                  }}
-                  cssClasses={["large"]}
-                >
-                  <label label={label} maxWidthChars={20} wrap />
-                </button>
-              ))}
-            </box>
-          )}
         </box>
+        {n.get_actions().length > 0 && (
+          <box cssClasses={["actions"]} halign={Gtk.Align.FILL}>
+            {n.get_actions().map(({ label, id }) => (
+              <button
+                hexpand
+                cursor={Gdk.Cursor.new_from_name("pointer", null)}
+                onClicked={() => {
+                  n.invoke(id);
+                }}
+                cssClasses={["notification__action"]}
+              >
+                <label
+                  label={label}
+                  maxWidthChars={1}
+                  ellipsize={Pango.EllipsizeMode.END}
+                />
+              </button>
+            ))}
+          </box>
+        )}
       </box>
     </box>
   );

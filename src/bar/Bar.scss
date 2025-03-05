@@ -45,13 +45,6 @@
 }
 
 .SysTray {
-  button {
-    all: unset;
-    &:hover {
-      all: unset;
-    }
-  }
-
   .menu,
   modelbutton {
     background-color: $bg;

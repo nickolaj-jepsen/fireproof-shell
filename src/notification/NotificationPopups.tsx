@@ -1,7 +1,7 @@
 import Notifd from "gi://AstalNotifd";
 import { Variable, bind, interval, timeout } from "astal";
 import { App, hook } from "astal/gtk4";
-import { Astal, type Gdk, Gtk } from "astal/gtk4";
+import { Astal, Gdk, Gtk } from "astal/gtk4";
 import config from "../config";
 import { VarMap } from "../utils/var-map";
 import Notification from "./Notification";
@@ -75,13 +75,15 @@ export default function NotificationPopups(gdkmonitor: Gdk.Monitor) {
             cssClasses={["notification__menu__count"]}
             xalign={0}
             label={count.as((n) =>
-              n === 1 ? "1 notification" : `${n} notifications`,
+              n === 1 ? "1 notification" : `${n} notifications`
             )}
           />
           <button
             onClicked={() => {
               notificationsMap.clear();
             }}
+            cssClasses={["button"]}
+            cursor={Gdk.Cursor.new_from_name("pointer", null)}
             label="Dismiss all"
           />
         </box>

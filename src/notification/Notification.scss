@@ -8,16 +8,21 @@
   min-width: 500px;
 
   &.low {
+    --color: $muted;
     border: 2px solid $muted;
-    .app-name {
-      color: $muted;
+    .notification__image,
+    .notification__action,
+    .notification__header {
+      border-color: $muted;
     }
   }
 
   &.critical {
     border: 2px solid $error;
-    .app-name {
-      color: $error;
+    .notification__image,
+    .notification__action,
+    .notification__header {
+      border-color: $error;
     }
   }
 
@@ -45,9 +50,33 @@
 }
 
 .notification__image {
-  border-radius: $radius;
+  border-right: 2px solid $accent;
 }
 
 .notification__content {
   padding: 15px;
+}
+
+.notification__header {
+  padding: 15px;
+  border-bottom: 2px solid $accent;
+}
+
+.notification__action {
+  padding: 15px;
+  border-top: 2px solid $accent;
+  border-left: 1px solid $accent;
+  border-right: 1px solid $accent;
+}
+
+.notification__action:first-child {
+  border-left: 0;
+  border-bottom-left-radius: $radius;
+}
+.notification__action:last-child {
+  border-right: 0;
+}
+
+.notification__action:hover {
+  background-color: $bg-alt;
 }

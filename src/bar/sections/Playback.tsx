@@ -1,7 +1,7 @@
 import Wp from "gi://AstalWp";
 import { Variable, bind } from "astal";
 import type { Binding, Subscribable } from "astal/binding";
-import { Gtk, type Gdk } from "astal/gtk4";
+import { Gdk, Gtk } from "astal/gtk4";
 import { hasIcon } from "../../utils/gtk";
 import { Expander, FlowBox, Separator } from "../../widgets";
 import { connectDropdown } from "./Dropdown";
@@ -41,6 +41,8 @@ function PlaybackEndpoint({ endpoint, visible }: PlaybackEndpointProps) {
     >
       <box spacing={10} hexpand>
         <button
+          cssClasses={["button"]}
+          cursor={Gdk.Cursor.new_from_name("pointer", null)}
           onButtonPressed={() => {
             endpoint.set_mute(!endpoint.mute);
           }}
@@ -55,6 +57,8 @@ function PlaybackEndpoint({ endpoint, visible }: PlaybackEndpointProps) {
           hexpand
         />
         <button
+          cssClasses={["button"]}
+          cursor={Gdk.Cursor.new_from_name("pointer", null)}
           visible={bind(defaultable)}
           onButtonPressed={() => {
             endpoint.set_is_default(true);

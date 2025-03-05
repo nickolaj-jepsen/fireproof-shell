@@ -30,6 +30,10 @@
   border: 2px solid transparent;
 }
 
+.launcher__plugin:hover {
+  background-color: $ui;
+}
+
 .launcher__plugin--selected {
   background-color: $ui;
   border: 2px solid $accent;
@@ -40,6 +44,10 @@
   margin: 5px 0;
   border-radius: var(--border-radius);
   border: 2px solid transparent;
+}
+
+.launcher__result:hover {
+  background-color: $ui;
 }
 
 .launcher__result--selected {

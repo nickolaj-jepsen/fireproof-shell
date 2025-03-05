@@ -44,3 +44,43 @@ notify-many:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget purus nec nunc ultricies lacinia. Nullam nec nunc nec nunc ultricies lacinia." \
         --app-name="Other app" \
         --icon=dialog-information
+
+notify-many-buttons:
+    notify-send \
+        "Title - 1 button" \
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget purus nec nunc ultricies lacinia. Null Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget purus nec nunc ultricies lacinia. Nullam nec nunc nec nunc ultricies lacinia. am nec nunc nec nunc ultricies lacinia. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget purus nec nunc ultricies lacinia. Nullam nec nunc nec nunc ultricies lacinia." \
+        --app-name="Justfile" \
+        --urgency=critical \
+        --action="Option 1" &
+    notify-send \
+        "Title - 2 buttons" \
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget purus nec nunc ultricies lacinia. Null Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget purus nec nunc ultricies lacinia. Nullam nec nunc nec nunc ultricies lacinia. am nec nunc nec nunc ultricies lacinia. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget purus nec nunc ultricies lacinia. Nullam nec nunc nec nunc ultricies lacinia." \
+        --app-name="Justfile" \
+        --urgency=normal \
+        --action="Option 1" \
+        --action="Option 2" &
+    notify-send \
+        "Title - 3 buttons" \
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget purus nec nunc ultricies lacinia. Null Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget purus nec nunc ultricies lacinia. Nullam nec nunc nec nunc ultricies lacinia. am nec nunc nec nunc ultricies lacinia. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget purus nec nunc ultricies lacinia. Nullam nec nunc nec nunc ultricies lacinia." \
+        --app-name="Justfile" \
+        --urgency=low \
+        --action="Option 1" \
+        --action="Option 2" \
+        --action="Option 3" &
+    notify-send \
+        "Title - 4 buttons" \
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget purus nec nunc ultricies lacinia. Null Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget purus nec nunc ultricies lacinia. Nullam nec nunc nec nunc ultricies lacinia. am nec nunc nec nunc ultricies lacinia. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget purus nec nunc ultricies lacinia. Nullam nec nunc nec nunc ultricies lacinia." \
+        --app-name="Justfile" \
+        --urgency=critical \
+        --action="Option 1" \
+        --action="Option 2" \
+        --action="Option 3" \
+        --action="Option 4" &
+    notify-send \
+        "Title - Long options" \
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget purus nec nunc ultricies lacinia. Null Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget purus nec nunc ultricies lacinia. Nullam nec nunc nec nunc ultricies lacinia. am nec nunc nec nunc ultricies lacinia. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam eget purus nec nunc ultricies lacinia. Nullam nec nunc nec nunc ultricies lacinia." \
+        --app-name="Justfile" \
+        --urgency=critical \
+        --action="Lorem ipsum dolor sit amet, consectetur adipiscing elit. " \
+        --action="Option 2" \
+        --action="Option 3" &
