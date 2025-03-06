@@ -1,11 +1,12 @@
 import Hyprland from "gi://AstalHyprland";
 import Apps from "gi://AstalApps";
 import config from "../config";
-import { subprocess } from "astal";
-import { sortByRelevancy } from "./sorter";
+import { GLib, subprocess } from "astal";
+import { FrequencySorter, sortByRelevancy } from "./sorter";
+import { emojis } from "../../data/emoji.json";
 
 export interface LauncherEntry {
-  iconName: string;
+  iconName?: string;
   name: string;
   description?: string;
   label?: string;
@@ -46,7 +47,7 @@ class AppLauncher implements LauncherPlugin {
 
 class Hypr implements LauncherPlugin {
   name = "Hypr";
-  command = "!h";
+  command = ".h";
   hypr = Hyprland.get_default();
   apps: {
     [key: string]: {
@@ -101,7 +102,7 @@ class Hypr implements LauncherPlugin {
 
 class Power implements LauncherPlugin {
   name = "Power";
-  command = "!p";
+  command = ".p";
 
   query(query: string): LauncherEntry[] {
     return sortByRelevancy(query, [
@@ -139,8 +140,42 @@ class Power implements LauncherPlugin {
   }
 }
 
+class Emoji implements LauncherPlugin {
+  name = "Emoji";
+  command = ".e";
+  freqStore = new FrequencySorter("emoji");
+  entries = emojis.map((emoji) => this.createEmojiEntry(this.freqStore, emoji));
+
+  query(query: string): LauncherEntry[] {
+    let entries = this.entries;
+    if (query) {
+      entries = sortByRelevancy(query, entries, { minimumScore: 1 });
+    }
+    return this.freqStore.sort(entries);
+  }
+
+  private createEmojiEntry(
+    freqStore: FrequencySorter,
+    emojiData: {
+      emoji: string;
+      name: string;
+      keywords?: string[];
+    },
+  ): LauncherEntry {
+    const name = `${emojiData.emoji} ${emojiData.name}`;
+    return {
+      name,
+      keywords: emojiData.keywords,
+      action: () => {
+        freqStore.update(name);
+        subprocess(`wtype "${emojiData.emoji}"`);
+      },
+    };
+  }
+}
+
 export const defaultPlugin = new AppLauncher();
-export const launcherPlugins = [new Hypr(), new Power()];
+export const launcherPlugins = [new Hypr(), new Emoji(), new Power()];
 
 export const parseQuery = (rawQuery: string): [LauncherPlugin, string] => {
   const query = rawQuery.split(" ");

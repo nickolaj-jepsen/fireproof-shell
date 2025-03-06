@@ -35,15 +35,16 @@ const closeLauncher = () => {
   launcher.hide();
 };
 
+const size = Variable({ mx: 100, my: 100 });
+const selected = Variable(0);
+const search = Variable("");
+
 export default function Launcher() {
   const lineHeight = Variable(0);
-  const size = Variable({ mx: 100, my: 100 });
   const mx = size((size) => size.mx);
   const my = size((size) => size.my);
 
-  const selected = Variable(0);
   const entryRef = Variable<Gtk.Entry | null>(null);
-  const search = Variable("");
   const resultLength = Variable(0); // Cache the length of the results so we don't have to recalculate it every time the cursor moves
 
   const setSearch = (query: string) => {
@@ -57,7 +58,7 @@ export default function Launcher() {
 
   const results = bind(search).as((search) => {
     const [plugin, query] = parseQuery(search);
-    const result = plugin.query(query);
+    const result = plugin.query(query).slice(0, 100);
     resultLength.set(result.length);
     return result;
   });
@@ -186,6 +187,7 @@ export default function Launcher() {
         >
           <entry
             cssClasses={["launcher__search"]}
+            placeholderText={"Search"}
             setup={(self) => {
               entryRef.set(self);
             }}
@@ -252,7 +254,7 @@ export default function Launcher() {
                         );
                       }}
                     >
-                      <overlay>
+                      <overlay visible={!!result.iconName}>
                         {result.label && (
                           <label
                             label={result.label}

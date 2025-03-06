@@ -75,7 +75,7 @@ export default function NotificationPopups(gdkmonitor: Gdk.Monitor) {
             cssClasses={["notification__menu__count"]}
             xalign={0}
             label={count.as((n) =>
-              n === 1 ? "1 notification" : `${n} notifications`
+              n === 1 ? "1 notification" : `${n} notifications`,
             )}
           />
           <button

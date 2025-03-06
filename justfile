@@ -7,6 +7,11 @@ dev: kill
 watch: kill
     watchexec -e tsx,ts,scss -r "ags run --gtk4 app.ts"
 
+update-emoji:
+    curl https://raw.githubusercontent.com/hfg-gmuend/openmoji/refs/heads/master/data/openmoji.json | \
+        jq '{emojis: [.[] | select ( .skintone == "" and .group != "extras-openmoji" ) | {emoji: .emoji, name: .annotation, tags: .tags | split(", "), category: .group }]}' \
+        > data/emoji.json
+
 notify-kitchensink:
     notify-send \
         "Title" \

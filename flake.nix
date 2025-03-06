@@ -34,6 +34,7 @@
       }: let
         extraPackages = with ags.packages.${pkgs.system}; [
           pkgs.uwsm
+          pkgs.wtype
           battery
           bluetooth
           hyprland
@@ -68,6 +69,8 @@
             pkgs.watchexec
             pkgs.just
             pkgs.libnotify
+            pkgs.curl
+            pkgs.jq
             agsPackage
           ];
         };

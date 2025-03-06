@@ -1,8 +1,10 @@
+import { GLib, readFile, writeFile } from "astal";
 import type { LauncherEntry } from "./plugins";
 
 export const sortByRelevancy = (
   query: string,
   entries: LauncherEntry[],
+  options?: { minimumScore?: number },
 ): LauncherEntry[] => {
   if (!query || query.trim() === "") {
     return entries;
@@ -10,6 +12,7 @@ export const sortByRelevancy = (
 
   const queryLower = query.toLowerCase().trim();
   const queryWords = queryLower.split(/\s+/);
+  const minimumScore = options?.minimumScore ?? 0;
 
   return entries
     .map((entry) => {
@@ -77,6 +80,46 @@ export const sortByRelevancy = (
 
       return { entry, relevance };
     })
+    .filter((item) => item.relevance >= minimumScore)
     .sort((a, b) => b.relevance - a.relevance)
     .map(({ entry }) => entry);
 };
+
+export class FrequencySorter {
+  path: string;
+  data: { [name: string]: number };
+
+  constructor(name: string) {
+    const cacheDir = GLib.get_user_cache_dir();
+    const dir = "/fireproof-shell/launcher/";
+    GLib.mkdir_with_parents(cacheDir + dir, 0o755);
+    this.path = cacheDir + dir + name + ".json";
+    this.data = this.load();
+  }
+
+  private load(): { [name: string]: number } {
+    try {
+      return JSON.parse(readFile(this.path));
+    } catch (e) {
+      return {};
+    }
+  }
+
+  private save(data: { [name: string]: number }) {
+    writeFile(this.path, JSON.stringify(data));
+  }
+
+  sort(entries: LauncherEntry[]): LauncherEntry[] {
+    return entries.sort((a, b) => {
+      const aFreq = this.data[a.name] || 0;
+      const bFreq = this.data[b.name] || 0;
+      return bFreq - aFreq;
+    });
+  }
+
+  update(name: string) {
+    const existing = this.data[name] || 0;
+    this.data[name] = existing + 1;
+    this.save(this.data);
+  }
+}

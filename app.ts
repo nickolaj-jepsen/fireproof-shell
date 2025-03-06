@@ -30,7 +30,8 @@ App.start({
     }
   },
   requestHandler(request: string, res: (response: any) => void) {
-    if (request == "launcher") {
+    const args = request.split(" ");
+    if (args[0] === "launcher") {
       openLauncher();
       res("launcher opened");
     } else {
