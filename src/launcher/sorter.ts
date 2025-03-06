@@ -1,85 +1,110 @@
 import { GLib, readFile, writeFile } from "astal";
 import type { LauncherEntry } from "./plugins";
 
+class Normalizer {
+  static cache: { [str: string]: string } = {};
+
+  get(str?: string): string {
+    if (!str) {
+      return "";
+    }
+
+    if (!Normalizer.cache[str]) {
+      Normalizer.cache[str] =
+        str
+          ?.toLowerCase() // Lowercase the query
+          ?.replace(/[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, "") // Remove non-alphanumeric characters
+          ?.trim() ?? ""; // Trim whitespace
+    }
+
+    return Normalizer.cache[str];
+  }
+}
+
+const calculateRelevance = (query: string, entry: LauncherEntry): number => {
+  const normalizer = new Normalizer();
+  const normalizedQuery = normalizer.get(query);
+  const queryWords = normalizedQuery.split(/\s+/);
+  const nameLower = normalizer.get(entry.name);
+  const descLower = normalizer.get(entry.description);
+  const keywords = entry.keywords?.map(normalizer.get) || [];
+
+  let relevance = 0;
+
+  // Exact match has highest priority
+  if (nameLower === normalizedQuery) {
+    relevance += 100;
+  }
+
+  // Direct keyword match has very high priority
+  if (keywords.some((kw) => kw === normalizedQuery)) {
+    relevance += 90;
+  }
+
+  // Starts with query is next highest
+  if (nameLower.startsWith(normalizedQuery)) {
+    relevance += 50;
+  }
+
+  // Keyword starts with query
+  if (keywords.some((kw) => kw.startsWith(normalizedQuery))) {
+    relevance += 40;
+  }
+
+  // Contains the query string
+  if (nameLower.includes(normalizedQuery)) {
+    relevance += 30;
+  }
+
+  // Calculate word-level matches
+  for (const word of normalizedQuery) {
+    if (word.length < 2) continue;
+
+    // Keyword contains the query term
+    if (keywords.some((kw) => kw.includes(word))) {
+      relevance += 25;
+    }
+
+    // Word match
+    if (queryWords.some((nameWord) => nameWord === word)) {
+      relevance += 20;
+    }
+
+    // Word starts with query term
+    if (queryWords.some((nameWord) => nameWord.startsWith(word))) {
+      relevance += 15;
+    }
+
+    // Name contains the word
+    if (nameLower.includes(word)) {
+      relevance += 10;
+    }
+
+    // Description contains the word
+    if (descLower.includes(word)) {
+      relevance += 5;
+    }
+  }
+
+  return relevance;
+};
+
 export const sortByRelevancy = (
   query: string,
   entries: LauncherEntry[],
-  options?: { minimumScore?: number },
+  options?: { minimumScore?: number }
 ): LauncherEntry[] => {
-  if (!query || query.trim() === "") {
+  const minimumScore = options?.minimumScore ?? 0;
+
+  if (!query.trim()) {
     return entries;
   }
 
-  const queryLower = query.toLowerCase().trim();
-  const queryWords = queryLower.split(/\s+/);
-  const minimumScore = options?.minimumScore ?? 0;
-
   return entries
-    .map((entry) => {
-      const nameLower = entry.name.toLowerCase();
-      const descLower = entry.description?.toLowerCase() || "";
-      const keywords = entry.keywords?.map((kw) => kw.toLowerCase()) || [];
-      let relevance = 0;
-
-      // Exact match has highest priority
-      if (nameLower === queryLower) {
-        relevance += 100;
-      }
-
-      // Direct keyword match has very high priority
-      if (keywords.some((kw) => kw === queryLower)) {
-        relevance += 90;
-      }
-
-      // Starts with query is next highest
-      if (nameLower.startsWith(queryLower)) {
-        relevance += 50;
-      }
-
-      // Keyword starts with query
-      if (keywords.some((kw) => kw.startsWith(queryLower))) {
-        relevance += 40;
-      }
-
-      // Contains the query string
-      if (nameLower.includes(queryLower)) {
-        relevance += 30;
-      }
-
-      // Calculate word-level matches
-      for (const word of queryWords) {
-        if (word.length < 2) continue;
-
-        // Keyword contains the query term
-        if (keywords.some((kw) => kw.includes(word))) {
-          relevance += 25;
-        }
-
-        // Word match
-        if (nameLower.split(/\s+/).some((nameWord) => nameWord === word)) {
-          relevance += 20;
-        }
-
-        // Word starts with query term
-        if (
-          nameLower.split(/\s+/).some((nameWord) => nameWord.startsWith(word))
-        ) {
-          relevance += 15;
-        }
-
-        // Name contains the word
-        if (nameLower.includes(word)) {
-          relevance += 10;
-        }
-
-        // Description contains the word
-        if (descLower.includes(word)) {
-          relevance += 5;
-        }
-      }
-
-      return { entry, relevance };
-    })
+    .map((entry) => ({
+      entry,
+      relevance: calculateRelevance(query, entry),
+    }))
     .filter((item) => item.relevance >= minimumScore)
     .sort((a, b) => b.relevance - a.relevance)
     .map(({ entry }) => entry);
