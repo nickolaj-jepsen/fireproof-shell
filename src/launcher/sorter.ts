@@ -92,7 +92,7 @@ const calculateRelevance = (query: string, entry: LauncherEntry): number => {
 export const sortByRelevancy = (
   query: string,
   entries: LauncherEntry[],
-  options?: { minimumScore?: number }
+  options?: { minimumScore?: number },
 ): LauncherEntry[] => {
   const minimumScore = options?.minimumScore ?? 0;
 
@@ -135,11 +135,27 @@ export class FrequencySorter {
   }
 
   sort(entries: LauncherEntry[]): LauncherEntry[] {
-    return entries.sort((a, b) => {
-      const aFreq = this.data[a.name] || 0;
-      const bFreq = this.data[b.name] || 0;
+    // Separate entries with frequency data from those without
+    const entriesWithFreq: LauncherEntry[] = [];
+    const entriesWithoutFreq: LauncherEntry[] = [];
+
+    for (const entry of entries) {
+      if (this.data[entry.name] > 0) {
+        entriesWithFreq.push(entry);
+      } else {
+        entriesWithoutFreq.push(entry);
+      }
+    }
+
+    // Sort only the entries with frequency data
+    entriesWithFreq.sort((a, b) => {
+      const aFreq = this.data[a.name];
+      const bFreq = this.data[b.name];
       return bFreq - aFreq;
     });
+
+    // Return sorted entries with frequency data followed by entries without frequency data
+    return [...entriesWithFreq, ...entriesWithoutFreq];
   }
 
   update(name: string) {
