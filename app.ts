@@ -5,6 +5,7 @@ import Launcher, { openLauncher } from "./src/launcher/Launcher";
 import NotificationPopups from "./src/notification/NotificationPopups";
 import Bar from "./src/bar/Bar";
 import SecondaryBar from "./src/bar/SecondaryBar";
+import { launcherPlugins } from "./src/launcher/plugins";
 
 const HELP_TEXT = `fireproof-shell (over astal ipc)
 
@@ -32,10 +33,18 @@ App.start({
   requestHandler(request: string, res: (response: any) => void) {
     const args = request.split(" ");
     if (args[0] === "launcher") {
-      openLauncher();
-      res("launcher opened");
-    } else {
-      res(HELP_TEXT);
+      const query = args.slice(1).join(" ");
+
+      const launcherPlugin = launcherPlugins.find((p) => p.command === query);
+      if (launcherPlugin) {
+        openLauncher(`${launcherPlugin.command} `);
+        return res(`launcher opened with plugin: ${launcherPlugin.name}`);
+      }
+
+      openLauncher(query);
+      return res("launcher opened");
     }
+
+    return res(HELP_TEXT);
   },
 });

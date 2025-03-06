@@ -17,10 +17,26 @@ const { TOP, LEFT, RIGHT, BOTTOM } = Astal.WindowAnchor;
 
 const LAUNCHER_NAME = "launcher";
 
-export const openLauncher = () => {
+export const openLauncher = (query = "") => {
   const launcher = App.get_window(LAUNCHER_NAME);
   if (!launcher) {
     throw new Error("Launcher is not enabled!");
+  }
+
+  // Set size
+  const { width, height } = activeMonitor().get_geometry();
+  size.set({
+    mx: (width - 800) / 2,
+    my: (height - 600) / 2,
+  });
+
+  // Reset search
+  search.set(query);
+  selected.set(0);
+  const entry = entryRef.get();
+  if (entry) {
+    entry.set_text(query);
+    entry.set_position(-1);
   }
 
   launcher.show();
@@ -35,26 +51,20 @@ const closeLauncher = () => {
   launcher.hide();
 };
 
+const entryRef = Variable<Gtk.Entry | null>(null);
 const size = Variable({ mx: 100, my: 100 });
+
 const selected = Variable(0);
 const search = Variable("");
+const resultLength = Variable(0); // Cache the length of the results so we don't have to recalculate it every time the cursor moves
 
 export default function Launcher() {
   const lineHeight = Variable(0);
+
   const mx = size((size) => size.mx);
   const my = size((size) => size.my);
 
-  const entryRef = Variable<Gtk.Entry | null>(null);
-  const resultLength = Variable(0); // Cache the length of the results so we don't have to recalculate it every time the cursor moves
-
-  const setSearch = (query: string) => {
-    search.set(query);
-    selected.set(0);
-  };
-
-  const currentPlugin = bind(search).as((search) => {
-    return parseQuery(search)[0];
-  });
+  const currentPlugin = bind(search).as((search) => parseQuery(search)[0]);
 
   const results = bind(search).as((search) => {
     const [plugin, query] = parseQuery(search);
@@ -144,20 +154,6 @@ export default function Launcher() {
     if (ctrl && keyval === Gdk.KEY_c) closeLauncher();
   };
 
-  const reset = () => {
-    search.set("");
-    entryRef.get()?.set_text("");
-    selected.set(0);
-  };
-
-  const resize = () => {
-    const { width, height } = activeMonitor().get_geometry();
-    size.set({
-      mx: (width - 800) / 2,
-      my: (height - 600) / 2,
-    });
-  };
-
   return (
     <window
       name={LAUNCHER_NAME}
@@ -168,12 +164,6 @@ export default function Launcher() {
       application={App}
       onKeyPressed={onKeyPressed}
       onKeyReleased={onKeyReleased}
-      onNotifyVisible={(self) => {
-        if (self.visible) {
-          reset();
-          resize();
-        }
-      }}
     >
       <overlay onHoverLeave={() => closeLauncher()}>
         <box
@@ -192,7 +182,8 @@ export default function Launcher() {
               entryRef.set(self);
             }}
             onNotifyText={(self) => {
-              setSearch(self.text);
+              search.set(self.text);
+              selected.set(0);
             }}
             onActivate={() => {
               results.get()[selected.get()].action();
